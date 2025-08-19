@@ -1,0 +1,37 @@
+select
+    bbi.bill_id as csv_bill_id,
+    ba.type as csv_actor_type,
+    ba.external_id as csv_actor_external_id,
+case bbi.type
+          when 'ORDER' then 'ORDER'
+          when 'EFFECTIVE_COMMISSION' then 'EFFECTIVE_COMMISSION'
+          # Aggregated
+          when 'COST_PER_ORDER_ASSUMED' then 'GLOVO_BALANCE_DISCOUNT'
+          when 'GLOVO_BALANCE_DISCOUNT' then 'GLOVO_BALANCE_DISCOUNT'
+          # Standard
+          when 'COURIER_COST_PER_ORDER_ASSUMED' then 'GLOVO_BALANCE_VOUCHER'
+          when 'GLOVO_BALANCE_VOUCHER' then 'GLOVO_BALANCE_VOUCHER'
+          when 'DELIVERY_FEE' then 'DELIVERY_FEE'
+      end as csv_type,
+    case bbi.type
+          when 'ORDER' then concat(bbi.description, ' (correction)')
+          when 'EFFECTIVE_COMMISSION' then concat(bbi.description, ' (correction)')
+          # Aggregated
+          when 'COST_PER_ORDER_ASSUMED' then concat(replace(bbi.description, 'Cost Per Order Assumed', 'Glovo Balance Discount'), ' (correction)')
+          when 'GLOVO_BALANCE_DISCOUNT' then concat(bbi.description, ' (correction)')
+          # Standard
+          when 'COURIER_COST_PER_ORDER_ASSUMED' then concat(replace(bbi.description, 'Courier Cost Per Order Assumed', 'Glovo Balance Voucher'), ' (correction)')
+          when 'GLOVO_BALANCE_VOUCHER' then concat(bbi.description, ' (correction)')
+          when 'DELIVERY_FEE' then concat(bbi.description, ' (correction)')
+      end as csv_description,
+    bbi.currency as csv_currency,
+    round(sum(- bbi.amount) / 100, 2) as csv_amount,
+    round(sum(- bbi.tax) / 100, 2) as csv_tax_amount,
+    bbi.source_type as csv_source_type,
+    bbi.source_id as csv_source_id
+from bls_bill_items bbi
+join bls_bills bb on bbi.bill_id = bb.id
+join bls_actors ba on bb.actor_id = ba.id
+where ba.type = 'PARTNER'
+-- and bbi.source_id in (429191617,429611142,429691523,429728405,430317993)
+group by csv_source_id, csv_type
