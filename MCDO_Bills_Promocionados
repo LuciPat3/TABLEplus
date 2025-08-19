@@ -1,0 +1,22 @@
+SELECT
+	bbi.source_id   As order_id,
+    ba.external_id                                                                      AS store_address_id,
+    ba.city_code,
+    ba.country_code,
+    bbi.creation_time   AS creation_time,
+    SUM(IF(bbi.type = 'ORDER', bbi.amount,0)) / 100.0                                  AS Products,
+    SUM(IF(bbi.type in ( 'DELIVERY_FEE','MINIMUM_BASKET_SURCHARGE', 'SURCHARGE'), bbi.amount, 0)) / 100.0                              AS DF
+FROM
+    bls_bill_items     bbi
+        JOIN bls_bills bb ON bbi.bill_id = bb.id
+        JOIN bls_actors ba ON bb.actor_id = ba.id
+WHERE ba.partner_family = 'MCDONALDS'
+and country_code = 'ES'
+-- and bb.status = 'Processing'
+and bbi.source_id in(100693617305,100718776259,100722230428,100728273152,100727785323,100728383615,100727693497,100729576898,100731566323,100732086425,100735423427,100733602498,100736253022,100736202054,100736269111
+)
+-- and bbi.bill_id in (136871122,136871123,136871124,136871126,136871128)
+-- and date(bbi.creation_time) BETWEEN '2022-04-25' and '2022-04-30' 
+GROUP BY 1,2,3,4,5;
+
+
