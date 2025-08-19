@@ -1,0 +1,17 @@
+SELECT * FROM bls_actors
+WHERE partner_family = 'MCDONALDS'
+AND country_code = 'ES'
+AND type = 'PARTNER'
+-- AND external_id IN (173970)
+
+
+select
+    count(*)
+from inv_invoices
+WHERE DATE_FORMAT(creation_time,'%Y%m')= '202210' AND state = 'EMITTED' 
+AND country_code='ES' AND emitter_actor_type <> 'COURIER';
+
+
+SELECT external_id FROM bls_actors
+WHERE country_code = 'ES'
+AND partner_family = 'MCDONALDS'
