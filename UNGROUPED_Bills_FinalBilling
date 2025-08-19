@@ -1,0 +1,84 @@
+/* SELECT ii.serial_number,
+       ba.external_id as store_address_id,
+       ba.store_id as store_id,
+       ba.store_address_external_id as store_address_external_id,
+       ii.recipient_fiscal_info,
+       upper(ifd.tax_id),
+       iii.concept,
+       iii.base_amount/100 as base_amount,
+       iii.tax_amount/100 as tax_amount,
+       bb.status as bill_status,
+       ii.state as invoice_status,
+       bb.billing_cycle_start,
+       bb.billing_cycle_end
+from bls_bills bb
+         join bls_actors ba on bb.actor_id = ba.id 
+         join inv_invoices ii on ii.bill_id = bb.id
+         join inv_invoice_items iii on ii.id = iii.invoice_id
+         join inv_fiscal_details ifd on ba.external_id = ifd.actor_external_id and ba.type= ifd.actor_type
+where ba.partner_family = 'BURGERKING'
+  and ba.country_code = 'ES'
+  and bb.status not in ('VOID')
+  and bb.closed_at > '2024-11-19'
+  and ifd.actor_type IN ('PARTNER', 'CONSOLIDATED_PARTNER') */
+  
+  
+/* SELECT
+    pnl_order_level.order_id  AS "pnl_order_level.order_id",
+        (DATE_FORMAT(pnl_order_level.p_creation_date , '%Y-%m-%d')) AS "pnl_order_level.p_creation_date",
+    pnl_order_level.order_country_code  AS "pnl_order_level.order_country_code",
+    pnl_order_level.order_subvertical  AS "pnl_order_level.order_subvertical",
+    pnl_order_level.order_subvertical2  AS "pnl_order_level.order_subvertical2",
+        (HOUR(pnl_order_level.order_started_local_at )) AS "pnl_order_level.order_started_local_at_hour_of_day"
+FROM finance_financial_reports_odp.pnl_order_level  AS pnl_order_level
+LEFT JOIN delta.central_geography_odp.cities_v2  AS cities ON pnl_order_level.order_city_code = cities.city_code
+WHERE (((( HOUR(pnl_order_level.order_started_local_at ) ) >= 11 AND ( HOUR(pnl_order_level.order_started_local_at ) ) <= 13))) AND ((( pnl_order_level.p_creation_date  ) >= ((TIMESTAMP '2025-04-09')) AND ( pnl_order_level.p_creation_date  ) < ((DATE_ADD('day', 1, TIMESTAMP '2025-04-09'))))) AND (pnl_order_level.order_country_code ) = 'ES' AND (pnl_order_level.order_subvertical2 ) IN ('COURIER_BUSINESS', 'Courier') AND (cities.country_area ) IN ('ES - MADRID ACCELERATE', 'ES - MADRID THRIVE')
+GROUP BY
+    1,
+    2,
+    3,
+    4,
+    5,
+    6
+ORDER BY
+    2 DESC
+LIMIT 500 */
+
+
+/* SELECT *
+FROM delta.finance_financial_metrics_odp.financial_order_metrics
+WHERE order_country_code = 'ES'
+AND order_id IN (100902060845); */
+
+/* SELECT
+    pnl_order_level.order_id AS "pnl_order_level.order_id",
+    CAST(pnl_order_level.p_creation_date AS DATE) AS "pnl_order_level.p_creation_date",
+    pnl_order_level.order_country_code AS "pnl_order_level.order_country_code",
+    pnl_order_level.order_subvertical AS "pnl_order_level.order_subvertical",
+    pnl_order_level.order_subvertical2 AS "pnl_order_level.order_subvertical2",
+    date_format(pnl_order_level.order_started_local_at, '%H') AS "pnl_order_level.order_started_local_at_hour_of_day"
+FROM finance_financial_reports_odp.pnl_order_level AS pnl_order_level
+LEFT JOIN delta.central_geography_odp.cities_v2 AS cities 
+    ON pnl_order_level.order_city_code = cities.city_code
+WHERE 
+    date_format(pnl_order_level.order_started_local_at, '%H') >= '11'
+    AND date_format(pnl_order_level.order_started_local_at, '%H') <= '13'
+    AND pnl_order_level.p_creation_date >= DATE '2025-04-09'
+    AND pnl_order_level.p_creation_date < DATE '2025-04-10'
+    AND pnl_order_level.order_country_code = 'ES'
+    AND pnl_order_level.order_subvertical2 IN ('COURIER_BUSINESS', 'Courier')
+    AND cities.country_area IN ('ES - MADRID ACCELERATE', 'ES - MADRID THRIVE')
+GROUP BY
+    pnl_order_level.order_id,
+    CAST(pnl_order_level.p_creation_date AS DATE),
+    pnl_order_level.order_country_code,
+    pnl_order_level.order_subvertical,
+    pnl_order_level.order_subvertical2,
+    date_format(pnl_order_level.order_started_local_at, '%H')
+ORDER BY
+    CAST(pnl_order_level.p_creation_date AS DATE) DESC
+LIMIT 500 */
+
+SELECT *
+FROM finance_financial_reports_odp.pnl_order_level AS pnl_order_level
+LIMIT 1;
