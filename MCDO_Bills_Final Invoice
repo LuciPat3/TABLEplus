@@ -1,0 +1,97 @@
+SELECT ii.serial_number,
+       ba.external_id as store_address_id,
+       ii.recipient_fiscal_info,
+       ifd.tax_id,
+       iii.concept,
+       iii.base_amount/100 as base_amount,
+       iii.tax_amount/100 as tax_amount,
+       bb.status as bill_status,
+       ii.state as invoice_status,
+       bb.closed_at,
+       bb.billing_cycle_start,
+       bb.billing_cycle_end
+from bls_bills bb
+         join bls_actors ba on bb.actor_id = ba.id 
+         join inv_invoices ii on ii.bill_id = bb.id
+         join inv_invoice_items iii on ii.id = iii.invoice_id
+         join inv_fiscal_details ifd on ba.external_id = ifd.actor_external_id and ba.type= ifd.actor_type
+where ba.partner_family = 'MCDONALDS'
+  and ba.country_code = 'ES'
+-- and ba.external_id in (651088,651839)
+  and bb.status not in ('VOID')
+  and bb.closed_at > '2024-07-17'
+  and ifd.actor_type IN ('PARTNER', 'CONSOLIDATED_PARTNER')
+  
+----- 
+  
+  SELECT ii.serial_number,
+       ba.external_id as store_address_id,
+       ii.recipient_fiscal_info,
+       ifd.tax_id,
+       iii.concept,
+       iii.base_amount/100 as base_amount,
+       iii.tax_amount/100 as tax_amount,
+       bb.status as bill_status,
+       ii.state as invoice_status,
+       bb.closed_at,
+       bb.billing_cycle_start,
+       bb.billing_cycle_end
+from bls_bills bb
+         join bls_actors ba on bb.actor_id = ba.id 
+         join inv_invoices ii on ii.bill_id = bb.id
+         join inv_invoice_items iii on ii.id = iii.invoice_id
+         join inv_fiscal_details ifd on ba.external_id = ifd.actor_external_id and ba.type= ifd.actor_type
+where ba.partner_family = 'STANDARD'
+  and ba.country_code = 'ES'
+  and ba.external_id in (651088,651839)
+-- and iii.concept = 'PLATFORM_FEE'
+  and bb.status not in ('VOID')
+  and bb.closed_at > '2024-01-03'
+  and ifd.actor_type IN ('PARTNER', 'CONSOLIDATED_PARTNER')
+   
+  
+  
+  
+SELECT ii.serial_number as invoice_id,
+bb.id as bill_id,ba.external_id as store_address_id,
+iii.concept,iii.base_amount,
+iii.tax_amount,bb.processing_date,
+bb.processing_at
+from bls_bills bb 
+join bls_actors ba on bb.actor_id = ba.id
+join inv_invoices ii on ii.bill_id = bb.id
+join inv_invoice_items iii on ii.id = iii.invoice_id
+where ba.partner_family = 'MCDONALDS'
+and ba.country_code = 'ES'
+and bb.status not in ('VOID')
+and bb.closed_at > '2023-05-10'
+
+
+SELECT ba.external_id as store_address_id,
+    ii.serial_number as invoice_number,
+    bi.source_id as order_id,
+    bi.type,
+    cast(bi.amount / 100.00 as decimal(15,2)) as bi_amount,
+    cast(bi.tax / 100.00 as decimal(15,2)) as bi_tax
+from bls_bill_items bi 
+left join bls_bills bls on bi.bill_id = bls.id
+left join inv_invoices ii on bls.id = ii.bill_id
+left join bls_actors ba on ii.recipient_external_actor_id = ba.id
+where ba.partner_family = 'MCDONALDS'
+and ba.country_code = 'ES'
+and bls.status not in ('VOID')
+and bls.closed_at > '2023-05-10'
+
+
+
+
+SELECT ba.external_id as store_address_id,
+    ii.serial_number as invoice_number,
+    bi.source_id as order_id,
+    bi.type,
+    cast(bi.amount / 100.00 as decimal(15,2)) as bi_amount,
+    cast(bi.tax / 100.00 as decimal(15,2)) as bi_tax
+from bls_bill_items bi left join bls_bills bls on bi.bill_id = bls.id
+    left join inv_invoices ii on bls.id = ii.bill_id
+    left join bls_actors ba on ii.recipient_external_actor_id = ba.id
+where ii.serial_number IN ('IT-PF-ZVWAY4Y-001/23')
