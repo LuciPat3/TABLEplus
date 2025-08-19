@@ -1,0 +1,49 @@
+SELECT
+ba.external_id                                                                                    AS store_address_id,
+bbi.bill_id                                                                                       AS bill_id,
+bbi.source_id                                                                                     AS order_id,
+-- SUM(CASE WHEN bbi.type = 'CUSTOMER_DELIVERY_FEE' THEN bbi.amount ELSE 0 END) / 100.0              AS customer_DF,
+-- SUM(CASE WHEN bbi.type = 'CUSTOMER_SERVICE_FEE' THEN bbi.amount ELSE 0 END) / 100.0               AS customer_SF,
+-- SUM(CASE WHEN bbi.type = 'DELIVERY_FEE_TO_CHARGE_PARTNER' THEN bbi.amount ELSE 0 END) / 100.0     AS DF_to_charge_partner,
+-- SUM(CASE WHEN bbi.type = 'GLOVO_DELIVERY_FEE' THEN bbi.amount ELSE 0 END) / 100.0                 AS Glovo_DF,
+-- SUM(CASE WHEN bbi.type = 'IMPORT' THEN bbi.amount ELSE 0 END) / 100.0                             AS import,
+-- SUM(CASE WHEN bbi.type = 'PARTNER_BALANCE_DISCOUNT' THEN bbi.amount ELSE 0 END) / 100.0           AS partner_balance_discount,
+-- SUM(CASE WHEN bbi.type = 'PARTNER_DELIVERY_FEE' THEN bbi.amount ELSE 0 END) / 100.0               AS partner_DF,
+-- SUM(CASE WHEN bbi.type = 'PARTNER_EFFECTIVE_COMMISSION' THEN bbi.amount ELSE 0 END) / 100.0       AS partner_EF,
+-- SUM(CASE WHEN bbi.type = 'PRODUCTS_TO_PAY_PARTNER' THEN bbi.amount ELSE 0 END) / 100.0            AS products_to_pay_partner,
+-- SUM(CASE WHEN bbi.type = 'SANCTION' THEN bbi.amount ELSE 0 END) / 100.0                           AS sanction,
+-- SUM(CASE WHEN bbi.type = 'SERVICE_FEE' THEN bbi.amount ELSE 0 END) / 100.0                        AS SF,
+SUM(CASE WHEN bbi.type = 'ORDER' THEN bbi.amount ELSE 0 END) / 100.0                              AS products,
+SUM(CASE WHEN bbi.type = 'DELIVERY_FEE' THEN bbi.amount ELSE 0 END) / 100.0                       AS DF,
+SUM(CASE WHEN bbi.type = 'MINIMUM_BASKET_SURCHARGE' THEN bbi.amount ELSE 0 END) / 100.0                          AS MBS,
+ABS(SUM(IF(bbi.type IN ('DELIVERY_FEE','MINIMUM_BASKET_SURCHARGE'),bbi.amount, 0)))  / 100.0 AS DF_total,
+SUM(CASE WHEN bbi.type = 'PRODUCTS_PAID_IN_CASH' THEN bbi.amount ELSE 0 END) / 100.0              AS cash,
+SUM(CASE WHEN bbi.type = 'PROMOTION' THEN bbi.amount ELSE 0 END) / 100.0                          AS promotion,
+SUM(CASE WHEN bbi.type = 'PROMOTION_ON_DELIVERY' THEN bbi.amount ELSE 0 END) / 100.0              AS DF_promos,
+SUM(CASE WHEN bbi.type = 'REFUND' THEN bbi.amount ELSE 0 END) / 100.0                             AS refund,
+SUM(CASE WHEN bbi.type = 'ADJUSTMENT' THEN bbi.amount ELSE 0 END) / 100.0                         AS adjustment,
+SUM(CASE WHEN bbi.type = 'COST_PER_ORDER_ASSUMED' THEN bbi.amount ELSE 0 END) / 100.0             AS cost_per_order_assumed,
+SUM(CASE WHEN bbi.type = 'CUSTOMER_BALANCE_DISCOUNT' THEN bbi.amount ELSE 0 END) / 100.0          AS customer_balance_discount,
+SUM(CASE WHEN bbi.type = 'EFFECTIVE_COMMISSION' THEN bbi.amount ELSE 0 END) / 100.0               AS EF,
+-- SUM(CASE WHEN bbi.type = 'PLATFORM_FEE' THEN bbi.amount ELSE 0 END) / 100.0                       AS PLATFORM_FEE,
+-- SUM(CASE WHEN bbi.type = 'SALES_FEE' THEN bbi.amount ELSE 0 END) / 100.0                          AS SALES_FEE,
+-- SUM(CASE WHEN bbi.type = 'MKT_ACTIONS' THEN bbi.amount ELSE 0 END) / 100.0                        AS MKT_ACTIONS,
+-- SUM(CASE WHEN bbi.type = 'MKT_BUBBLE' THEN bbi.amount ELSE 0 END) / 100.0                         AS MKT_BUBBLE,
+-- SUM(CASE WHEN bbi.type = 'MKT_KEYWORDS' THEN bbi.amount ELSE 0 END) / 100.0                       AS MKT_KEYWORDS,
+-- SUM(CASE WHEN bbi.type = 'MKT_OTHER' THEN bbi.amount ELSE 0 END) / 100.0                          AS MKT_OTHER,
+-- SUM(CASE WHEN bbi.type = 'MKT_POSITIONING' THEN bbi.amount ELSE 0 END) / 100.0                    AS MKT_POSITIONING,
+ABS(SUM(IF(bbi.type IN ('COST_PER_ORDER_ASSUMED','EFFECTIVE_COMMISSION', 'GLOVO_BALANCE_DISCOUNT','COMMISSION'),
+bbi.amount, 0)))  / 100.0                                                        AS Partner_Commission
+FROM
+bls_bill_items      bbi
+JOIN bls_bills  bb ON bbi.bill_id = bb.id
+JOIN bls_actors ba ON bb.actor_id = ba.id
+JOIN bls_orders_information od ON bbi.source_id = od.order_id
+-- WHERE bb.status = 'PROCESSING'
+-- Here you add the closing cycle dates, take a 4 day gap
+WHERE ba.partner_family = 'MCDONALDS'
+  -- and bb.status = 'PROCESSING'
+  and date(bb.processing_date) = '2023-07-30'
+  -- and ba.type = 'PARTNER'
+  and ba.country_code = 'ES'
+GROUP BY 1,2,3;
