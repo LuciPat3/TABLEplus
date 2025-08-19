@@ -1,0 +1,19 @@
+SELECT
+    bbi.bill_id,
+    bbi.source_id                                                                       AS order_id,
+    -- boi.order_code                                                                      AS order_code,
+    ba.external_id                                                                      AS store_address_id,
+    ba.city_code,
+    ba.country_code,
+    SUM(IF(bbi.type = 'DELIVERY_FEE_TO_CHARGE_PARTNER', bbi.amount, 0)) / 100.0                                  AS DF_TO_CHARGE,
+    SUM(IF(bbi.type = 'REFUND', bbi.amount, 0)) / 100.0                                 AS Refund,
+    SUM(IF(bbi.type = 'PRODUCTS_TO_PAY_PARTNER', bbi.amount, 0)) / 100.0                  AS Products_paid_in_cash
+FROM
+    bls_bill_items     bbi
+        JOIN bls_bills bb ON bbi.bill_id = bb.id
+        JOIN bls_actors ba ON bb.actor_id = ba.id
+WHERE
+ba.partner_family = 'MCDONALDS'
+and country_code = 'ES'
+and date(bb.processing_date) = '2022-12-25'
+GROUP BY 1,2,3,4,5;
