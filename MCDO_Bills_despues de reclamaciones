@@ -1,0 +1,16 @@
+SELECT
+    ba.external_id                                                                      AS store_address_id,
+    ba.city_code,
+    ba.country_code,
+    SUM(IF(bbi.type = 'ORDER', bbi.amount, 0)) / 100.0                                  AS Products,
+    SUM(IF(bbi.type in ( 'DELIVERY_FEE','MINIMUM_BASKET_SURCHARGE', 'SURCHARGE'), bbi.amount, 0)) / 100.0                              AS DF
+FROM
+    bls_bill_items     bbi
+        JOIN bls_bills bb ON bbi.bill_id = bb.id
+        JOIN bls_actors ba ON bb.actor_id = ba.id
+WHERE
+ba.partner_family = 'MCDONALDS'
+and country_code = 'ES'
+and date(bb.processing_date) = '2023-04-23'
+GROUP BY 1,2,3;
+
