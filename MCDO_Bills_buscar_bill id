@@ -1,0 +1,8 @@
+SELECT
+       bb.id AS bill_id,
+       bbi.source_id AS order_id
+FROM
+    bls_bill_items      bbi
+        JOIN bls_bills  bb ON bbi.bill_id = bb.id
+        JOIN bls_actors ba ON bb.actor_id = ba.id
+WHERE bbi.source_id IN (510763108,510764877,510767803,510772475)
