@@ -1,0 +1,52 @@
+select ba.type as actor_type,
+		bb.id,
+		bbi.creation_time,
+       ba.external_id as actor_external_id,
+       bbi.description as description,
+       bbi.currency as currency,
+       bbi.amount / 100 as amount,
+       bbi.tax / 100 as tax_amount,
+       bbi.type as type,
+       bbi.source_type,
+       bbi.source_id
+       -- boi.dispatching_time
+from bls_bill_items bbi
+    join bls_bills bb on bbi.bill_id = bb.id
+    join bls_actors ba on bb.actor_id = ba.id
+    -- join bls_orders_information boi on boi.order_id = bbi.source_id -- and bbi.source_type = 'ORDER'query
+where ba.type in ('PARTNER', 'CONSOLIDATED_PARTNER')
+-- and bbi.bill_item_import_id is null
+-- and ba.external_id in (165447)
+and bbi.source_id in(100720008830)
+-- and bbi.bill_id in (405338224)
+-- and date(bbi.creation_time) BETWEEN '2023-02-05' and '2023-02-06'
+
+
+------
+
+select ba.type as actor_type,
+		bb.id,
+		bb.closed_at,
+		bbi.creation_time,
+       ba.external_id as actor_external_id,
+       ba.store_address_external_id as store,
+       bbi.description as description,
+       bbi.currency as currency,
+       bbi.amount / 100 as amount,
+       bbi.tax / 100 as tax_amount,
+       bbi.type as type,
+       bbi.source_type,
+       bbi.source_id
+       -- boi.dispatching_time
+from bls_bill_items bbi
+    join bls_bills bb on bbi.bill_id = bb.id
+    join bls_actors ba on bb.actor_id = ba.id
+    -- join bls_orders_information boi on boi.order_id = bbi.source_id -- and bbi.source_type = 'ORDER'
+where ba.type in ('PARTNER', 'CONSOLIDATED_PARTNER')
+-- and ba.partner_family = 'STANDARD'
+and ba.country_code = 'ES'
+-- and bbi.type = 'order'
+-- and bbi.bill_item_import_id is null
+-- and ba.external_id in (526171,443802,435351,435332,383095,376668,376661,257982,232379,209667,201871,182205,176289,176281,176261,175696,173983,173970,113919,80455,80454,50400,50397,38986,38985,35254,31768,23977,23872,23869,23563,23562,23561,23542,23027,23014,21677,21618,21552,21541,21400,21392,17902,15554,15548)
+-- and bbi.bill_id in (352261238)
+and bbi.source_id in (100626279364,100636848261,100639209820,100625948088,100636981609,100627565050,100638049649,100634728420,100630531913,100629171460,100633160641,100626503726,100632282376)
